@@ -38,3 +38,25 @@ To get started with this project locally, follow these steps:
    ```bash
    git clone https://github.com/your-username/tic-tac-toe.git
    cd tic-tac-toe
+
+2. Install dependencies
+   ``` bash
+   pnpm install
+
+3. Set up Firebase:
+Go to the Firebase Console.
+Create a new project and enable Google Authentication.
+Set up Firestore for storing user scores.
+Copy your Firebase configuration into a .env.local file in the project root:
+
+   ``` bash
+    NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key
+   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-auth-domain
+   NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-storage-bucket
+   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+   NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id
+
+4. Run development server
+     ``` bash
+   pnpm run dev
