@@ -1,53 +1,40 @@
-# Next.js & NextUI Template
+# Tic-Tac-Toe Game
 
-This is a template for creating applications using Next.js 14 (app directory) and NextUI (v2).
+A simple, interactive Tic-Tac-Toe game built with **Next.js** and **Firebase**. Play against the computer (bot) or with another player, track your score, and customize the game board!
 
-[Try it on CodeSandbox](https://githubbox.com/nextui-org/next-app-template)
+## Features
 
-## Technologies Used
+- **Play against a bot** or with a second player.
+- **Track player scores** using Firebase Firestore.
+- **Google Authentication** for user login.
+- **Customizable game board** with color picker.
+- **Sound effects** for player and bot moves.
+- **Victory celebration effect** when a player wins.
+- **Reset button** to start a new game.
+- **Responsive design** for mobile and desktop.
 
-- [Next.js 14](https://nextjs.org/docs/getting-started)
-- [NextUI v2](https://nextui.org/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Tailwind Variants](https://tailwind-variants.org)
-- [TypeScript](https://www.typescriptlang.org/)
-- [Framer Motion](https://www.framer.com/motion/)
-- [next-themes](https://github.com/pacocoursey/next-themes)
+## Tech Stack
 
-## How to Use
+- **Next.js**: React framework for building the game interface.
+- **Firebase**: Handles authentication and Firestore for score tracking.
+- **TypeScript**: For type-safe code.
+- **Tailwind CSS**: For inline, custom styling.
+- **React**: For state management and game logic.
 
-### Use the template with create-next-app
+## Installation
 
-To create a new project based on this template using `create-next-app`, run the following command:
+To get started with this project locally, follow these steps:
 
-```bash
-npx create-next-app -e https://github.com/nextui-org/next-app-template
-```
+### Prerequisites
 
-### Install dependencies
+- **Node.js** (v14 or later)
+- **npm** or **yarn**
+- A Firebase project with **Google Authentication** and **Firestore** enabled.
 
-You can use one of them `npm`, `yarn`, `pnpm`, `bun`, Example using `npm`:
+### Steps
 
-```bash
-npm install
-```
+1. Clone this repository:
 
-### Run the development server
-
-```bash
-npm run dev
-```
-
-### Setup pnpm (optional)
-
-If you are using `pnpm`, you need to add the following code to your `.npmrc` file:
-
-```bash
-public-hoist-pattern[]=*@nextui-org/*
-```
-
-After modifying the `.npmrc` file, you need to run `pnpm install` again to ensure that the dependencies are installed correctly.
-
-## License
-
-Licensed under the [MIT license](https://github.com/nextui-org/next-app-template/blob/main/LICENSE).
+   ```bash
+   git clone https://github.com/your-username/tic-tac-toe.git
+   cd tic-tac-toe
