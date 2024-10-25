@@ -14,6 +14,7 @@ import {
   MailIcon,
 } from "@/components/icons/index";
 import { RestartIcon } from "@/components/icons/RestartIcon";
+import BackgroundMusic from "@/components/background-music";
 
 enum PlayerMark {
   X = "X",
@@ -49,7 +50,11 @@ const initialInterface: BoardInterface = {
 const TicTacToe: React.FC = () => {
   const { user, score, playerWinStack, onChangeScore, onChangePlayerWinStack } =
     useAuthContext();
-  const { fetchScore, updateScore } = useUserScore(user?.uid, user?.email || "", 0);
+  const { fetchScore, updateScore } = useUserScore(
+    user?.uid,
+    user?.email || "",
+    0
+  );
   const { width, height } = useWindowSize(); // Get window size for confetti
   const [board, setBoard] = useState<Board>(initialBoard);
   const [isPlayerTurn, setIsPlayerTurn] = useState<boolean>(true); // Player starts as 'X'
@@ -194,7 +199,9 @@ const TicTacToe: React.FC = () => {
     <>
       <section className="max-w-lg mx-auto text-center">
         <div className="my-3">
-          <h2 className="text-3xl lg:text-4xl font-bold text-secondary-600">Tic Tac Toe</h2>
+          <h2 className="text-3xl lg:text-4xl font-bold text-secondary-600">
+            Tic Tac Toe
+          </h2>
           <p className="text-sm text-gray-600 dark:text-white">Player vs Bot</p>
         </div>
         <div className="grid grid-cols-3 mx-3">
@@ -233,13 +240,15 @@ const TicTacToe: React.FC = () => {
         </div>
         <div className="py-4">
           <p className="text-xl text-secondary-500">
-            Your score: <span className="font-semibold text-secondary-500">{score}</span>
+            Your score:{" "}
+            <span className="font-semibold text-secondary-500">{score}</span>
           </p>
           <p className="text-gray-600 dark:text-white text-sm">
             Streak: {playerWinStack} (Get bonus points by winning 3 times!)
           </p>
         </div>
         <div className="flex flex-row gap-2 w-full">
+          <BackgroundMusic />
           <Button
             onClick={() => setOpenSettingModal(true)}
             variant="flat"
@@ -249,9 +258,15 @@ const TicTacToe: React.FC = () => {
             Setting Interface
           </Button>
           {/* {gameOver && ( */}
-            <Button onClick={resetGame} color="secondary" isDisabled={!gameOver} fullWidth startContent={<RestartIcon/>}>
-              Start New Game
-            </Button>
+          <Button
+            onClick={resetGame}
+            color="secondary"
+            isDisabled={!gameOver}
+            fullWidth
+            startContent={<RestartIcon />}
+          >
+            Start New Game
+          </Button>
           {/* )} */}
         </div>
       </section>
