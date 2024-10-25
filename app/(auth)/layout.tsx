@@ -23,7 +23,7 @@ export default function BoardLayout({
 
   return (
     <section>
-      <div className="py-6">{children}</div>
+      <div className="py-2">{children}</div>
     </section>
   );
 }

@@ -193,13 +193,13 @@ const TicTacToe: React.FC = () => {
     <>
       <section className="max-w-lg mx-auto text-center">
         <div className="my-3">
-          <h2 className="text-4xl font-bold text-primary-600">Tic Tac Toe</h2>
+          <h2 className="text-3xl lg:text-4xl font-bold text-primary-600">Tic Tac Toe</h2>
           <p className="text-sm text-gray-600 dark:text-white">Player vs Bot</p>
         </div>
-        <div className="grid grid-cols-3 mx-5">
+        <div className="grid grid-cols-3 mx-3">
           {board.map((value, index) => (
             <Button
-              className="h-[100px] md:h-[140px] border border-white"
+              className="h-[70px] sm:h-[100px] md:h-[120px] border border-white"
               radius="none"
               size="lg"
               style={{
