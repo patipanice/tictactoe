@@ -13,6 +13,7 @@ import {
   CameraIcon,
   MailIcon,
 } from "@/components/icons/index";
+import { RestartIcon } from "@/components/icons/RestartIcon";
 
 enum PlayerMark {
   X = "X",
@@ -193,13 +194,13 @@ const TicTacToe: React.FC = () => {
     <>
       <section className="max-w-lg mx-auto text-center">
         <div className="my-3">
-          <h2 className="text-3xl lg:text-4xl font-bold text-primary-600">Tic Tac Toe</h2>
+          <h2 className="text-3xl lg:text-4xl font-bold text-secondary-600">Tic Tac Toe</h2>
           <p className="text-sm text-gray-600 dark:text-white">Player vs Bot</p>
         </div>
         <div className="grid grid-cols-3 mx-3">
           {board.map((value, index) => (
             <Button
-              className="h-[70px] sm:h-[100px] md:h-[120px] border border-white"
+              className="h-[100px] md:h-[120px] border border-white"
               radius="none"
               size="lg"
               style={{
@@ -212,7 +213,7 @@ const TicTacToe: React.FC = () => {
               <span
                 className={
                   winningLine.includes(index)
-                    ? "text-red-500 font-bold text-2xl"
+                    ? "text-red-600 font-extrabold text-2xl"
                     : "text-neutral-900 text-2xl"
                 }
               >
@@ -231,26 +232,27 @@ const TicTacToe: React.FC = () => {
           ))}
         </div>
         <div className="py-4">
-          <p className="text-xl text-primary-500">
-            Your score: <span className="font-semibold">{score}</span>
+          <p className="text-xl text-secondary-500">
+            Your score: <span className="font-semibold text-secondary-500">{score}</span>
           </p>
           <p className="text-gray-600 dark:text-white text-sm">
-            Win stack: {playerWinStack} (win 3 times get bonus points!)
+            Streak: {playerWinStack} (Get bonus points by winning 3 times!)
           </p>
         </div>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-row gap-2 w-full">
           <Button
             onClick={() => setOpenSettingModal(true)}
             variant="flat"
             color="default"
+            fullWidth
           >
             Setting Interface
           </Button>
-          {gameOver && (
-            <Button onClick={resetGame} color="primary">
+          {/* {gameOver && ( */}
+            <Button onClick={resetGame} color="secondary" isDisabled={!gameOver} fullWidth startContent={<RestartIcon/>}>
               Start New Game
             </Button>
-          )}
+          {/* )} */}
         </div>
       </section>
       <ModalBoardSetting
