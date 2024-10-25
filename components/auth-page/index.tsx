@@ -118,7 +118,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ authMode }) => {
         size="md"
         fullWidth
         startContent={<GoogleIcon />}
-        className="bg-white border border-gray-400"
+        className="bg-white border border-gray-400 dark:text-black"
       >
         Login with Google
       </Button>
