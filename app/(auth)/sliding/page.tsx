@@ -35,6 +35,7 @@ const SlidingPuzzle: React.FC = () => {
   const [isGameWon, setIsGameWon] = useState(false);
   const [timer, setTimer] = useState(0);
   const [isTimerActive, setIsTimerActive] = useState(false);
+  const clickSound = new Audio("/sounds/sound-click.mp3");
 
   useEffect(() => {
     let timerInterval: NodeJS.Timeout | undefined;
@@ -52,6 +53,8 @@ const SlidingPuzzle: React.FC = () => {
   }, [puzzle]);
 
   const handleTileClick = (index: number) => {
+    clickSound.play()
+    clickSound.volume = 0.2
     if (!isTimerActive) setIsTimerActive(true);
 
     const emptyIndex = puzzle.indexOf(null);
