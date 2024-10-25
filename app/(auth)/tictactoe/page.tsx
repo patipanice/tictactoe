@@ -15,10 +15,18 @@ import {
 } from "@/components/icons/index";
 import { RestartIcon } from "@/components/icons/RestartIcon";
 import BackgroundMusic from "@/components/background-music";
+import { Switch } from "@nextui-org/switch";
+import { SkullIcon } from "@/components/icons/SkullIcon";
 
 enum PlayerMark {
   X = "X",
   O = "O",
+}
+
+enum BotLevel {
+  easy = "easy",
+  normal = "normal",
+  hard = "hard",
 }
 
 type Player = PlayerMark.X | PlayerMark.O | null;
@@ -74,6 +82,7 @@ const TicTacToe: React.FC = () => {
     useState<BoardInterface>(initialInterface);
   const [openSettingModal, setOpenSettingModal] = useState<boolean>(false);
   const [showConfetti, setShowConfetti] = useState(false); // Control confetti display
+  const [botLevel, setBotLevel] = useState<BotLevel>(BotLevel.normal);
 
   const clickSound = new Audio("/sounds/sound-click.mp3");
   const gameBonusSound = new Audio("/sounds/sound-game-bonus.mp3");
@@ -121,40 +130,56 @@ const TicTacToe: React.FC = () => {
   }, []);
 
   const botPlay = (squares: Board): void => {
-    //? for harder bot play
-    const findWinningMove = (player: PlayerMark): number | null => {
-      for (const [a, b, c] of winPatterns) {
-        if (squares[a] === player && squares[a] === squares[b] && squares[c] === null)
-          return c;
-        if (squares[a] === player && squares[a] === squares[c] && squares[b] === null)
-          return b;
-        if (squares[b] === player && squares[b] === squares[c] && squares[a] === null)
-          return a;
-      }
-      return null;
-    };
-  
-    // First, check if bot can win
-    let move = findWinningMove(PlayerMark.O);
-    if (move === null) {
-      // Block player's winning move
-      move = findWinningMove(PlayerMark.X);
-    }
-    if (move === null) {
-      // If no winning or blocking move, pick a random available spot
+    if (botLevel === BotLevel.normal) {
+      // Normal: Random available square
       const availableMoves = squares
         .map((val, index) => (val === null ? index : null))
         .filter((val) => val !== null) as number[];
-      move = availableMoves[Math.floor(Math.random() * availableMoves.length)];
-    }
-  
-    if (move !== null) {
+      const randomMove =
+        availableMoves[Math.floor(Math.random() * availableMoves.length)];
+      squares[randomMove] = PlayerMark.O;
+    } else {
+      // Hard: Winning/blocking logic
+      const findWinningMove = (player: PlayerMark): number | null => {
+        for (const [a, b, c] of winPatterns) {
+          if (
+            squares[a] === player &&
+            squares[a] === squares[b] &&
+            squares[c] === null
+          )
+            return c;
+          if (
+            squares[a] === player &&
+            squares[a] === squares[c] &&
+            squares[b] === null
+          )
+            return b;
+          if (
+            squares[b] === player &&
+            squares[b] === squares[c] &&
+            squares[a] === null
+          )
+            return a;
+        }
+        return null;
+      };
+
+      // Try to win or block
+      let move = findWinningMove(PlayerMark.O) || findWinningMove(PlayerMark.X);
+      if (move === null) {
+        const availableMoves = squares
+          .map((val, index) => (val === null ? index : null))
+          .filter((val) => val !== null) as number[];
+        move =
+          availableMoves[Math.floor(Math.random() * availableMoves.length)];
+      }
       squares[move] = PlayerMark.O;
-      setBoard(squares);
-      evaluateGameState(squares, PlayerMark.O); // Reevaluate the game state
     }
+
+    setBoard(squares);
+    evaluateGameState(squares, PlayerMark.O);
   };
-  
+
   const handlePlayerMove = (index: number): void => {
     if (board[index] || gameOver) return; // Ignore if the square is occupied or the game is over
     clickSound.play();
@@ -185,7 +210,6 @@ const TicTacToe: React.FC = () => {
         _playerWinStack = 0;
         gameBonusSound.play();
       }
-
     } else {
       //? bot winner
       _score = score === 0 ? 0 : score + -1;
@@ -209,7 +233,7 @@ const TicTacToe: React.FC = () => {
     },
     [checkWinner, handleWin]
   );
-  
+
   const resetGame = (): void => {
     clickSound.play();
     setBoard(initialBoard);
@@ -271,6 +295,20 @@ const TicTacToe: React.FC = () => {
           </p>
         </div>
         <div className="flex flex-row gap-2 w-full">
+          <Button
+            startContent={botLevel === BotLevel.normal ? <HeartIcon /> : <SkullIcon/>}
+            isIconOnly
+            color={botLevel === BotLevel.hard ? "danger" : "default"}
+            onClick={() =>
+              setBotLevel((prev) => {
+                if (prev === BotLevel.normal) {
+                  return BotLevel.hard;
+                } else {
+                  return BotLevel.normal;
+                }
+              })
+            }
+          />
           <BackgroundMusic />
           <Button
             onClick={() => setOpenSettingModal(true)}
