@@ -48,6 +48,8 @@ const saveNewUserToFireStoreCollection = async (user: User) => {
     displayName: user.displayName,
     creationTime: user.metadata.creationTime,
     createdAt: serverTimestamp(),
+    score: 0,
+    winStack: 0
   });
 };
 
