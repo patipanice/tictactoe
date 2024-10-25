@@ -46,6 +46,16 @@ const initialInterface: BoardInterface = {
     backgroundColor: colors[2],
   },
 };
+const winPatterns: WinningLine[] = [
+  [0, 1, 2],
+  [3, 4, 5],
+  [6, 7, 8],
+  [0, 3, 6],
+  [1, 4, 7],
+  [2, 5, 8],
+  [0, 4, 8],
+  [2, 4, 6],
+];
 
 const TicTacToe: React.FC = () => {
   const { user, score, playerWinStack, onChangeScore, onChangePlayerWinStack } =
@@ -96,17 +106,6 @@ const TicTacToe: React.FC = () => {
 
   // Function to determine if there is a winner
   const checkWinner = useCallback((squares: Board): Player => {
-    const winPatterns: WinningLine[] = [
-      [0, 1, 2],
-      [3, 4, 5],
-      [6, 7, 8],
-      [0, 3, 6],
-      [1, 4, 7],
-      [2, 5, 8],
-      [0, 4, 8],
-      [2, 4, 6],
-    ];
-
     for (let i = 0; i < winPatterns.length; i++) {
       const [a, b, c] = winPatterns[i];
       if (
@@ -122,21 +121,40 @@ const TicTacToe: React.FC = () => {
   }, []);
 
   const botPlay = (squares: Board): void => {
-    const availableMoves = squares
-      .map((val, index) => (val === null ? index : null))
-      .filter((val) => val !== null);
-
-    if (availableMoves.length > 0) {
-      const randomMove = availableMoves[
-        Math.floor(Math.random() * availableMoves.length)
-      ] as number;
-
-      squares[randomMove] = PlayerMark.O;
+    //? for harder bot play
+    const findWinningMove = (player: PlayerMark): number | null => {
+      for (const [a, b, c] of winPatterns) {
+        if (squares[a] === player && squares[a] === squares[b] && squares[c] === null)
+          return c;
+        if (squares[a] === player && squares[a] === squares[c] && squares[b] === null)
+          return b;
+        if (squares[b] === player && squares[b] === squares[c] && squares[a] === null)
+          return a;
+      }
+      return null;
+    };
+  
+    // First, check if bot can win
+    let move = findWinningMove(PlayerMark.O);
+    if (move === null) {
+      // Block player's winning move
+      move = findWinningMove(PlayerMark.X);
+    }
+    if (move === null) {
+      // If no winning or blocking move, pick a random available spot
+      const availableMoves = squares
+        .map((val, index) => (val === null ? index : null))
+        .filter((val) => val !== null) as number[];
+      move = availableMoves[Math.floor(Math.random() * availableMoves.length)];
+    }
+  
+    if (move !== null) {
+      squares[move] = PlayerMark.O;
       setBoard(squares);
-      evaluateGameState(squares, PlayerMark.O); // Evaluate the state after the bot's move
+      evaluateGameState(squares, PlayerMark.O); // Reevaluate the game state
     }
   };
-
+  
   const handlePlayerMove = (index: number): void => {
     if (board[index] || gameOver) return; // Ignore if the square is occupied or the game is over
     clickSound.play();
@@ -191,7 +209,7 @@ const TicTacToe: React.FC = () => {
     },
     [checkWinner, handleWin]
   );
-
+  
   const resetGame = (): void => {
     clickSound.play();
     setBoard(initialBoard);
