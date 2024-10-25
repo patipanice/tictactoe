@@ -15,7 +15,6 @@ import {
 } from "@/components/icons/index";
 import { RestartIcon } from "@/components/icons/RestartIcon";
 import BackgroundMusic from "@/components/background-music";
-import { Switch } from "@nextui-org/switch";
 import { SkullIcon } from "@/components/icons/SkullIcon";
 
 enum PlayerMark {
