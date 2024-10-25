@@ -250,10 +250,10 @@ const TicTacToe: React.FC = () => {
           </h2>
           <p className="text-sm text-gray-600 dark:text-white">Player vs Bot</p>
         </div>
-        <div className={`grid grid-cols-3 mx-3 `}>
+        <div className={`grid grid-cols-3 mx-3 md:px-10`}>
           {board.map((value, index) => (
             <Button
-              className={"h-[100px] md:h-[130px] border border-white"}
+              className={"h-[100px] md:h-[110px] border border-white"}
               radius="none"
               size="lg"
               style={{
