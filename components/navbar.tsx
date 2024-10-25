@@ -71,13 +71,13 @@ export const Navbar = () => {
       </NavbarContent>
 
       <NavbarMenu>
-        <div className="mx-4 mt-2 flex flex-col gap-2">
+        <div className="mx-4 mt-2 flex flex-col gap-2 space-y-4">
         <AuthSection/>
           {siteConfig.navMenuItems.map((item, index) => (
             <NavbarMenuItem key={`${item}-${index}`}>
               <Link
-                href="#"
                 size="lg"
+                href={item.href}
               >
                 {item.label}
               </Link>
