@@ -8,11 +8,10 @@ import {
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
   User,
-  GoogleAuthProvider,
   signInWithPopup,
 } from "firebase/auth";
 import { auth, collectionName, db, googleProvider } from "@/config/firebase";
-import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import { AuthFormValue } from "@/types/auth";
 import { useRouter } from "next/navigation";
 import { AuthMode } from "@/enums/auth.enum";
@@ -57,7 +56,7 @@ interface AuthPageProps {
 }
 
 const AuthPage: React.FC<AuthPageProps> = ({ authMode }) => {
-  const { login, onChangeScore } = useAuthContext();
+  const { login } = useAuthContext();
   const router = useRouter();
   const [savedPassword, setSavedPassword] = useState<string | null>(null);
 
@@ -88,7 +87,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ authMode }) => {
         await createNewUserEmailAndPasswordFirebaseAuth(email, password).then(
           (res) => {
             if (res?.status === 200) {
-              router.push("/home");
+              router.push("/tictactoe");
             }
           }
         );
@@ -103,29 +102,10 @@ const AuthPage: React.FC<AuthPageProps> = ({ authMode }) => {
 
   const handleGoogleSignIn = async () => {
     try {
-      const result = await signInWithPopup(auth, googleProvider);
-      const user = result.user;
-      fetchUserScore(user.uid);
-      // The signed-in user info
-      // You can also access the user's Google Access Token here
-      const credential = GoogleAuthProvider.credentialFromResult(result);
-      const token = credential?.accessToken;
-      console.log("Google Access Token:", token);
+      await signInWithPopup(auth, googleProvider);
     } catch (error) {
+      alert(String(error))
       console.error("Error during Google Sign-In:", error);
-    }
-  };
-
-   const fetchUserScore = async (userId: string) => {
-    const userDocRef = doc(db, 'users', userId);
-    const userDoc = await getDoc(userDocRef);
-
-    if (userDoc.exists()) {
-      onChangeScore(userDoc.data()?.score || 0)
-    } else {
-      // If user does not exist, create a new entry with a score of 0
-      await setDoc(userDocRef, { score: 0 });
-      onChangeScore(0)
     }
   };
 

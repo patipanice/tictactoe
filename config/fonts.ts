@@ -13,7 +13,6 @@ export const fontMono = FontMono({
 
 export const fontKanit = Kanit({
     subsets: ['latin','thai','latin-ext'],
-    // display: 'swap',
     weight: "300",
     variable: '--font-kanit'
 })

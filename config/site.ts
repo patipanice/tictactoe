@@ -5,18 +5,22 @@ export const siteConfig = {
   description: "tictactoe game",
   navItems: [
     {
-      label: "TicTacToe",
+      label: "Home",
       href: "/tictactoe",
+    },
+    {
+      label: "Leaderboard",
+      href: "/leaderboard",
     },
   ],
   navMenuItems: [
     {
-      label: "Logout",
-      href: "/logout",
+      label: "Leaderboard",
+      href: "/leaderboard",
     },
   ],
   links: {
-    github: "https://github.com/nextui-org/nextui",
+    github: "https://github.com/patipanice",
     twitter: "https://twitter.com/getnextui",
     docs: "https://nextui.org",
     discord: "https://discord.gg/9b6yyZKmH4",

@@ -1,19 +1,18 @@
 "use client";
-import { Button } from "@nextui-org/button";
 import { useState, useEffect, useCallback } from "react";
-import { HeartIcon } from "@/components/icons/HeartIcon";
-import { CameraIcon } from "@/components/icons/CameraIcon";
-import { BinIcon } from "@/components/icons/BinIcon";
-import ModalBoardSetting, { colors } from "@/components/modal-board-setting";
-
 import Confetti from "react-confetti";
+import { Button } from "@nextui-org/button";
+import ModalBoardSetting, { colors } from "@/components/modal-board-setting";
 import useWindowSize from "@/hooks/useWindowSize";
-import { TrophyIcon } from "@/components/icons/TrophyIcon";
-import { MailIcon } from "@/components/icons/MailIcon";
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
-import { collectionName, db } from "@/config/firebase";
 import { useAuthContext } from "@/contexts/auth-context";
 import { MarkSymbol } from "@/enums/game.enum";
+import useUserScore from "@/hooks/useUserScore";
+import {
+  HeartIcon,
+  BinIcon,
+  CameraIcon,
+  MailIcon,
+} from "@/components/icons/index";
 
 enum PlayerMark {
   X = "X",
@@ -47,35 +46,47 @@ const initialInterface: BoardInterface = {
 };
 
 const TicTacToe: React.FC = () => {
-  const { user, score,playerWinStack, onChangeScore, onChangePlayerWinStack } = useAuthContext()
-  const [board, setBoard] = useState<Board>(initialBoard); // 3x3 board
+  const { user, score, playerWinStack, onChangeScore, onChangePlayerWinStack } =
+    useAuthContext();
+  const { fetchScore, updateScore } = useUserScore(user?.uid, user?.email || "", 0);
+  const { width, height } = useWindowSize(); // Get window size for confetti
+  const [board, setBoard] = useState<Board>(initialBoard);
   const [isPlayerTurn, setIsPlayerTurn] = useState<boolean>(true); // Player starts as 'X'
   const [gameOver, setGameOver] = useState<boolean>(false); // To track game state
   const [winningLine, setWinningLine] = useState<WinningLine>([]); // Track winning line
-  const [boardInterface, setBoardInterface] = useState<BoardInterface>(initialInterface);
+  const [boardInterface, setBoardInterface] =
+    useState<BoardInterface>(initialInterface);
   const [openSettingModal, setOpenSettingModal] = useState<boolean>(false);
   const [showConfetti, setShowConfetti] = useState(false); // Control confetti display
-  const { width, height } = useWindowSize(); // Get window size for confetti
 
   const clickSound = new Audio("/sounds/sound-click.mp3");
   const gameBonusSound = new Audio("/sounds/sound-game-bonus.mp3");
 
   useEffect(() => {
-    const fetchUserScore = async (userId: string) => {
-      const userDocRef = doc(db, collectionName.users, userId);
-      const userDoc = await getDoc(userDocRef);
+    clickSound.preload = "auto";
+    gameBonusSound.preload = "auto";
+  }, []);
 
-      if (userDoc.exists()) {
-        onChangeScore(userDoc.data()?.score || 0)
-        onChangePlayerWinStack(userDoc.data()?.winStack || 0)
+  useEffect(() => {
+    fetchScore().then((res) => {
+      if (res) {
+        onChangeScore(res.score);
+        onChangePlayerWinStack(res.winStack);
       } else {
-        // If user does not exist, create a new entry with a score of 0
-        await setDoc(userDocRef, { score: 0, winStack: 0 });
-        onChangeScore(0)
+        onChangeScore(0);
       }
-    };
-    fetchUserScore(user?.uid as string)
-  }, [user])
+    });
+  }, []);
+
+  //manage bot moves
+  useEffect(() => {
+    if (!isPlayerTurn && !gameOver) {
+      const newBoard = [...board];
+      setTimeout(() => {
+        botPlay(newBoard); // Bot makes its move
+      }, 500);
+    }
+  }, [isPlayerTurn, gameOver]);
 
   // Function to determine if there is a winner
   const checkWinner = useCallback((squares: Board): Player => {
@@ -104,38 +115,33 @@ const TicTacToe: React.FC = () => {
     return null;
   }, []);
 
-  // Bot's move logic
   const botPlay = (squares: Board): void => {
     const availableMoves = squares
       .map((val, index) => (val === null ? index : null))
       .filter((val) => val !== null);
+
     if (availableMoves.length > 0) {
       const randomMove = availableMoves[
         Math.floor(Math.random() * availableMoves.length)
       ] as number;
+
       squares[randomMove] = PlayerMark.O;
       setBoard(squares);
-      setIsPlayerTurn(true); // Switch back to player
+      evaluateGameState(squares, PlayerMark.O); // Evaluate the state after the bot's move
     }
   };
 
-  // Handle player’s move
   const handlePlayerMove = (index: number): void => {
     if (board[index] || gameOver) return; // Ignore if the square is occupied or the game is over
     clickSound.play();
+
     const newBoard = [...board];
     newBoard[index] = PlayerMark.X; // Player's move as 'X'
-    setBoard(newBoard);
 
-    const winner = checkWinner(newBoard);
-    if (winner) {
-      handleWin(winner);
-    } else {
-      setIsPlayerTurn(false); // Bot's turn after player move
-    }
+    setBoard(newBoard);
+    evaluateGameState(newBoard, PlayerMark.X); // Evaluate the state after the player's move
   };
 
-  // Handle winning logic
   const handleWin = (winner: Player): void => {
     setGameOver(true);
 
@@ -144,21 +150,36 @@ const TicTacToe: React.FC = () => {
       setTimeout(() => {
         setShowConfetti(false);
       }, 3000);
+
       let _score = score + 1;
       let _playerWinStack = playerWinStack + 1;
+
       if (playerWinStack === maxWinStack) {
         _score = score + 3;
         gameBonusSound.play();
-        _playerWinStack = 0
-        onChangePlayerWinStack(_playerWinStack);
-        updateUserScore(String(user?.uid), _score, _playerWinStack);
-      } else {
-        onChangePlayerWinStack(_playerWinStack);
-        updateUserScore(String(user?.uid), _score, _playerWinStack);
+        _playerWinStack = 0;
       }
+
       onChangeScore(_score);
+      onChangePlayerWinStack(_playerWinStack);
+
+      updateScore(_score, _playerWinStack); // firebase store update
     }
   };
+
+  const evaluateGameState = useCallback(
+    (newBoard: Board, currentPlayer: Player) => {
+      const winner = checkWinner(newBoard);
+      if (winner) {
+        handleWin(winner); // Handle win if a winner is found
+      } else if (newBoard.every((square) => square !== null)) {
+        setGameOver(true); // Set game over if it's a draw
+      } else {
+        setIsPlayerTurn(currentPlayer === PlayerMark.O); // Toggle turn
+      }
+    },
+    [checkWinner, handleWin]
+  );
 
   const resetGame = (): void => {
     clickSound.play();
@@ -168,40 +189,12 @@ const TicTacToe: React.FC = () => {
     setWinningLine([]);
   };
 
-  // Handle bot’s turn in a separate effect
-  useEffect(() => {
-    if (!isPlayerTurn && !gameOver) {
-      const newBoard = [...board];
-      setTimeout(() => {
-        botPlay(newBoard); // Bot takes a move
-        const winner = checkWinner(newBoard);
-        if (winner) {
-          setGameOver(true);
-          let _score = score - 1;
-          if (score === 0) {
-            _score = 0
-          }
-          updateUserScore(String(user?.uid), _score, 0);
-          onChangeScore(_score); // Deduct score for bot win
-          onChangePlayerWinStack(0); // Reset player win stack on bot win
-        }
-      }, 500);
-    }
-  }, [isPlayerTurn, gameOver]);
-
-  const updateUserScore = async (userId: string, newScore: number, playerWinStack: number) => {
-    const userDocRef = doc(db, collectionName.users, userId);
-    await updateDoc(userDocRef, { score: newScore, winStack: playerWinStack });
-  };
-
-  const isDraw = board.every((square) => square !== null);
-
   return (
     <>
       <section className="max-w-lg mx-auto text-center">
         <div className="my-3">
-          <h2 className="text-3xl font-bold text-primary-600">Tic Tac Toe</h2>
-          <p className="text-sm text-gray-600">Player vs Bot</p>
+          <h2 className="text-4xl font-bold text-primary-600">Tic Tac Toe</h2>
+          <p className="text-sm text-gray-600 dark:text-white">Player vs Bot</p>
         </div>
         <div className="grid grid-cols-3 mx-5">
           {board.map((value, index) => (
@@ -210,7 +203,7 @@ const TicTacToe: React.FC = () => {
               radius="none"
               size="lg"
               style={{
-                backgroundColor: boardInterface.board.backgroundColor
+                backgroundColor: boardInterface.board.backgroundColor,
               }}
               key={index}
               onClick={() => handlePlayerMove(index)}
@@ -220,7 +213,7 @@ const TicTacToe: React.FC = () => {
                 className={
                   winningLine.includes(index)
                     ? "text-red-500 font-bold text-2xl"
-                    : "text-black-600 text-2xl"
+                    : "text-neutral-900 text-2xl"
                 }
               >
                 {value && (
@@ -238,8 +231,10 @@ const TicTacToe: React.FC = () => {
           ))}
         </div>
         <div className="py-4">
-          <p className="text-xl text-primary-500">Your score: {score}</p>
-          <p className="text-gray-600 text-sm">
+          <p className="text-xl text-primary-500">
+            Your score: <span className="font-semibold">{score}</span>
+          </p>
+          <p className="text-gray-600 dark:text-white text-sm">
             Win stack: {playerWinStack} (win 3 times get bonus points!)
           </p>
         </div>
@@ -251,7 +246,7 @@ const TicTacToe: React.FC = () => {
           >
             Setting Interface
           </Button>
-          {(gameOver || isDraw) && (
+          {gameOver && (
             <Button onClick={resetGame} color="primary">
               Start New Game
             </Button>
@@ -292,10 +287,8 @@ const SymbolDisplay = ({
     return <CameraIcon />;
   } else if (symbol == MarkSymbol.bin) {
     return <BinIcon />;
-  } else if (symbol === MarkSymbol.trophy) {
-    return <TrophyIcon />
-  } else if (symbol === MarkSymbol.mail) {
-    return <MailIcon />
+  } else if (symbol == MarkSymbol.mail) {
+    return <MailIcon />;
   } else {
     return isPlayer ? <p>X</p> : <p>O</p>;
   }

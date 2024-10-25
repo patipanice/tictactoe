@@ -8,15 +8,18 @@ import {
   ModalFooter,
 } from "@nextui-org/modal";
 import { Radio, RadioGroup } from "@nextui-org/radio";
-import { HeartIcon } from "./icons/HeartIcon";
-import { CameraIcon } from "./icons/CameraIcon";
-import { BinIcon } from "./icons/BinIcon";
 import { Button } from "@nextui-org/button";
 import { Divider } from "@nextui-org/divider";
 import { CirclePicker } from "react-color";
-import { MailIcon } from "./icons/MailIcon";
-import { BoardInterface } from "@/app/(auth)/tictactoe/page";
 import { MarkSymbol } from "@/enums/game.enum";
+import {
+  HeartIcon,
+  BinIcon,
+  CameraIcon,
+  MailIcon,
+} from "@/components/icons/index";
+import { BoardInterface } from "@/app/(auth)/tictactoe/page";
+
 
 const symbolOptions = [
   {
@@ -34,7 +37,8 @@ const symbolOptions = [
   {
     value: "bin",
     label: <BinIcon />,
-  }, {
+  },
+  {
     value: "mail",
     label: <MailIcon />,
   },
@@ -47,10 +51,18 @@ export const colors = [
   "#FFF8DC",
   "#FAF0E6",
   "#F5FFFA",
-  "#FFFAF0",
-  "#FDF5E6",
-  "#F0FFF0",
-  "#E0FFFF",
+  "#FF6F61", // Coral
+  "#FFCCBC", // Peach
+  "#FFD54F", // Amber
+  "#A5D6A7", // Light Green
+  "#81D4FA", // Light Blue
+  "#B39DDB", // Light Purple
+  "#FFAB91", // Light Salmon
+  "#C5E1A5", // Pale Green
+  "#B3E5FC", // Light Cyan
+  "#DCE775", // Lime
+  "#F48FB1", // Light Pink
+  "#C5CAE9", // Light Blue Grey
 ];
 
 interface ModalBoardSettingProps {
@@ -117,7 +129,7 @@ const ModalBoardSetting: React.FC<ModalBoardSettingProps> = ({
                 ))}
               </RadioGroup>
               <Divider className="my-4" />
-              <p className="font-bold text-base text-primary-500">
+              <p className="font-bold text-base text-primary-500 mb-2">
                 Board background color
               </p>
               <CirclePicker

@@ -1,10 +1,9 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import {
   getAuth,
   GoogleAuthProvider
 } from "firebase/auth";
-import { getFirestore, Timestamp } from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 // Your web app's Firebase configuration
