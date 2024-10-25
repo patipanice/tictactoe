@@ -205,7 +205,7 @@ const TicTacToe: React.FC = () => {
       _playerWinStack = playerWinStack + 1;
 
       if (playerWinStack === maxWinStack) {
-        _score = score + 3;
+        _score = score + 1;
         _playerWinStack = 0;
         gameBonusSound.play();
       }
