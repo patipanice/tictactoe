@@ -15,6 +15,10 @@ export const siteConfig = {
   ],
   navMenuItems: [
     {
+      label: "Home",
+      href: "/tictactoe",
+    },
+    {
       label: "Leaderboard",
       href: "/leaderboard",
     },

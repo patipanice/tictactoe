@@ -5,6 +5,7 @@ import {
   NavbarMenuToggle,
   NavbarBrand,
   NavbarItem,
+  NavbarMenuItem,
 } from "@nextui-org/navbar";
 import { Link } from "@nextui-org/link";
 import { link as linkStyles } from "@nextui-org/theme";
@@ -72,23 +73,16 @@ export const Navbar = () => {
       <NavbarMenu>
         <div className="mx-4 mt-2 flex flex-col gap-2">
         <AuthSection/>
-          {/* {siteConfig.navMenuItems.map((item, index) => (
+          {siteConfig.navMenuItems.map((item, index) => (
             <NavbarMenuItem key={`${item}-${index}`}>
               <Link
-                color={
-                  index === 2
-                    ? "primary"
-                    : index === siteConfig.navMenuItems.length - 1
-                      ? "danger"
-                      : "foreground"
-                }
                 href="#"
                 size="lg"
               >
                 {item.label}
               </Link>
             </NavbarMenuItem>
-          ))} */}
+          ))}
         </div>
       </NavbarMenu>
     </NextUINavbar>
