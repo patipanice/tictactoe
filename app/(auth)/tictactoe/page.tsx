@@ -151,26 +151,31 @@ const TicTacToe: React.FC = () => {
   const handleWin = (winner: Player): void => {
     setGameOver(true);
 
+    let _score = 0;
+    let _playerWinStack = 0;
     if (winner === PlayerMark.X) {
       setShowConfetti(true);
       setTimeout(() => {
         setShowConfetti(false);
       }, 3000);
 
-      let _score = score + 1;
-      let _playerWinStack = playerWinStack + 1;
+      _score = score + 1;
+      _playerWinStack = playerWinStack + 1;
 
       if (playerWinStack === maxWinStack) {
         _score = score + 3;
-        gameBonusSound.play();
         _playerWinStack = 0;
+        gameBonusSound.play();
       }
 
-      onChangeScore(_score);
-      onChangePlayerWinStack(_playerWinStack);
-
-      updateScore(_score, _playerWinStack); // firebase store update
+    } else {
+      //? bot winner
+      _score = score === 0 ? 0 : score + -1;
+      _playerWinStack = 0;
     }
+    onChangeScore(_score);
+    onChangePlayerWinStack(_playerWinStack);
+    updateScore(_score, _playerWinStack); // firebase store update
   };
 
   const evaluateGameState = useCallback(
@@ -204,10 +209,10 @@ const TicTacToe: React.FC = () => {
           </h2>
           <p className="text-sm text-gray-600 dark:text-white">Player vs Bot</p>
         </div>
-        <div className="grid grid-cols-3 mx-3">
+        <div className={`grid grid-cols-3 mx-3 `}>
           {board.map((value, index) => (
             <Button
-              className="h-[100px] md:h-[120px] border border-white"
+              className={"h-[100px] md:h-[130px] border border-white"}
               radius="none"
               size="lg"
               style={{
@@ -220,7 +225,7 @@ const TicTacToe: React.FC = () => {
               <span
                 className={
                   winningLine.includes(index)
-                    ? "text-red-600 font-extrabold text-2xl"
+                    ? "text-red-600 font-extrabold text-2xl winner-effect"
                     : "text-neutral-900 text-2xl"
                 }
               >
@@ -241,7 +246,7 @@ const TicTacToe: React.FC = () => {
         <div className="py-4">
           <p className="text-xl text-secondary-500">
             Your score:{" "}
-            <span className="font-semibold text-secondary-500">{score}</span>
+            <span className={`font-semibold text-secondary-500`}>{score}</span>
           </p>
           <p className="text-gray-600 dark:text-white text-sm">
             Streak: {playerWinStack} (Get bonus points by winning 3 times!)
