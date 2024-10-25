@@ -317,7 +317,6 @@ const TicTacToe: React.FC = () => {
           >
             Setting Interface
           </Button>
-          {/* {gameOver && ( */}
           <Button
             onClick={resetGame}
             color="secondary"
@@ -327,7 +326,6 @@ const TicTacToe: React.FC = () => {
           >
             Start New Game
           </Button>
-          {/* )} */}
         </div>
       </section>
       <ModalBoardSetting
