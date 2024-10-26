@@ -1,5 +1,6 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { isMobile } from "react-device-detect";
 import Confetti from "react-confetti";
 import { Button } from "@nextui-org/button";
 import ModalBoardSetting, { colors } from "@/components/modal-board-setting";
@@ -83,13 +84,20 @@ const TicTacToe: React.FC = () => {
   const [showConfetti, setShowConfetti] = useState(false); // Control confetti display
   const [botLevel, setBotLevel] = useState<BotLevel>(BotLevel.normal);
 
-  const clickSound = new Audio("/sounds/sound-click.mp3");
-  const gameBonusSound = new Audio("/sounds/sound-game-bonus.mp3");
+  const clickSound = useRef<HTMLAudioElement>(
+    new Audio("/sounds/sound-click.mp3")
+  );
+  const gameBonusSound = useRef<HTMLAudioElement>(
+    new Audio("/sounds/sound-game-bonus.mp3")
+  );
 
   useEffect(() => {
-    clickSound.preload = "auto";
-    gameBonusSound.preload = "auto";
+    clickSound.current.preload = "auto";
+    gameBonusSound.current.preload = "auto";
   }, []);
+
+  const playClickSound = () => clickSound.current.play();
+  const playBonusSound = () => gameBonusSound.current.play();
 
   useEffect(() => {
     fetchScore().then((res) => {
@@ -181,7 +189,7 @@ const TicTacToe: React.FC = () => {
 
   const handlePlayerMove = (index: number): void => {
     if (board[index] || gameOver) return; // Ignore if the square is occupied or the game is over
-    clickSound.play();
+    playClickSound();
 
     const newBoard = [...board];
     newBoard[index] = PlayerMark.X; // Player's move as 'X'
@@ -207,7 +215,7 @@ const TicTacToe: React.FC = () => {
       if (playerWinStack === maxWinStack) {
         _score = botLevel === BotLevel.normal ? score + 1 : score + 2;
         _playerWinStack = 0;
-        gameBonusSound.play();
+        playBonusSound();
       }
     } else {
       //? bot winner
@@ -234,7 +242,7 @@ const TicTacToe: React.FC = () => {
   );
 
   const resetGame = (): void => {
-    clickSound.play();
+    playClickSound();
     setBoard(initialBoard);
     setIsPlayerTurn(true);
     setGameOver(false);
@@ -295,7 +303,9 @@ const TicTacToe: React.FC = () => {
         </div>
         <div className="flex flex-row gap-2 w-full">
           <Button
-            startContent={botLevel === BotLevel.normal ? <HeartIcon /> : <SkullIcon/>}
+            startContent={
+              botLevel === BotLevel.normal ? <HeartIcon /> : <SkullIcon />
+            }
             isIconOnly
             color={botLevel === BotLevel.hard ? "danger" : "default"}
             onClick={() =>
@@ -338,8 +348,8 @@ const TicTacToe: React.FC = () => {
         <Confetti
           width={width}
           height={height}
-          numberOfPieces={200}
-          gravity={0.4}
+          numberOfPieces={isMobile ? 50 : 200} // Reduce confetti count on mobile
+          gravity={isMobile ? 0.1 : 0.4} // Lower gravity for mobile
           colors={["#FFD700", "#FF4500", "#1E90FF"]}
         />
       )}
