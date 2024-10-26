@@ -35,7 +35,6 @@ const SlidingPuzzle: React.FC = () => {
   const [isGameWon, setIsGameWon] = useState(false);
   const [timer, setTimer] = useState(0);
   const [isTimerActive, setIsTimerActive] = useState(false);
-  const clickSound = new Audio("/sounds/sound-click.mp3");
 
   useEffect(() => {
     let timerInterval: NodeJS.Timeout | undefined;
@@ -48,13 +47,12 @@ const SlidingPuzzle: React.FC = () => {
       if (timerInterval) clearInterval(timerInterval);
     };
   }, [isTimerActive, isGameWon]);
+
   useEffect(() => {
     setIsGameWon(isSolved(puzzle, size));
   }, [puzzle]);
 
   const handleTileClick = (index: number) => {
-    clickSound.play()
-    clickSound.volume = 0.2
     if (!isTimerActive) setIsTimerActive(true);
 
     const emptyIndex = puzzle.indexOf(null);
@@ -107,9 +105,9 @@ const SlidingPuzzle: React.FC = () => {
         <Button onClick={handleShuffle} fullWidth>
           Shuffle
         </Button>
-        <Button onClick={handleReset} fullWidth>
+        {/* <Button onClick={handleReset} fullWidth>
           Reset Game
-        </Button>
+        </Button> */}
       </div>
       {isGameWon && <p className="text-green-500 mt-4">Congratulations! You solved the puzzle in {timer} seconds!</p>}
     </div>
